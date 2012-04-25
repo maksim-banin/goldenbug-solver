@@ -4,10 +4,6 @@ CXX           = g++
 CXXFLAGS      = -pipe -O2 -Wall -Wextra
 LINK          = g++
 
-####### Output directory
-
-OBJECTS_DIR   = ./
-
 ####### Files
 
 SOURCES       = *.cpp 
@@ -19,6 +15,7 @@ DESTDIR       = bin
 all:
 	$(CXX) -c $(CXXFLAGS) $(SOURCES)
 	mv $(OBJECTS) ./bin
+	cp tests.txt ./bin
 	$(LINK) ./bin/$(OBJECTS) -o ./bin/test
 	./bin/test
 

@@ -1,6 +1,6 @@
 #include <algorithm>
 #include <fstream>
-
+#include <iostream>
 #include "Theory.h"
 #include "FreqExpert.h"
 using namespace std;
