@@ -17,5 +17,6 @@ all:
 	mv $(OBJECTS) ./bin
 	cp tests.txt ./bin
 	$(LINK) ./bin/$(OBJECTS) -o ./bin/test
-	./bin/test
+	cd bin
+	./test
 
