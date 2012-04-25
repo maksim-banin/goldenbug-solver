@@ -37,6 +37,29 @@ vector<Theory> DictExpert::derive(const Theory &t, const string& riddle) {
 		iss >> tmp;
 		vs.push_back(tmp);
 	}
-	// TODO I want you to notice when I'm around
-	return vector<Theory>();
+
+	vector<Theory> ans;
+	for (size_t i = 0; i < vs.size(); ++i)
+		if (dic.find(normalize(vs[i])) != dic.end()) {
+			set<string> temp = dic.find(normalize(vs[i]))->second;
+			for (set<string>::iterator it = temp.begin(); it != temp.end(); ++it) {
+				Theory curr(t);
+				bool good = true;
+				for (size_t j = 0; j < it->size(); ++j) {
+					char from = vs[i][j], to = (*it)[j];
+					if (t.used_from.count(from) && t.rules.find(from)->second != to) {
+						good = false;
+						break;
+					}
+					if (t.used_to.count(to)) {
+						good = false;
+						break;
+					}
+					curr = curr.addRule(from, to);
+				}
+				if (good)
+					ans.push_back(curr);
+			}
+		}
+	return ans;
 }

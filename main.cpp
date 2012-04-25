@@ -6,7 +6,6 @@
 
 #include "Theory.h"
 #include "FreqExpert.h"
-#include "HipsterExpert.h"
 #include "DictExpert.h"
 using namespace std;
 
