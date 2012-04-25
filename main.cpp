@@ -11,12 +11,11 @@
 using namespace std;
 
 vector<Theory> solve(const string & riddle) {
-	const size_t MAX_INVOCATIONS = 10;
+	const size_t MAX_INVOCATIONS = 50;
 
 	vector<Expert*> exps;
 	exps.push_back(new FreqExpert());
-	exps.push_back(new HipsterExpert());
-	exps.push_back(new DictExpert());
+	//exps.push_back(new DictExpert());
 
 	queue<Theory> q;
 	vector<Theory> ans;
@@ -26,9 +25,12 @@ vector<Theory> solve(const string & riddle) {
 			cout << q.front()(riddle) << endl;
 			ans.push_back(q.front());
 		}
+        
+        cout << i << "\t " << q.front()(riddle) << endl;        
 
 		for (vector<Expert*>::iterator it = exps.begin(); it != exps.end(); ++it) {
 			vector<Theory> vt = (*it)->derive(q.front(), riddle);
+            cerr << "vt.stize() == " << vt.size() << endl;
 			q.pop();
 			for (size_t i = 0; i < vt.size(); ++i)
 				q.push(vt[i]);
@@ -37,6 +39,7 @@ vector<Theory> solve(const string & riddle) {
 
 	for (vector<Expert*>::iterator it = exps.begin(); it != exps.end(); ++it)
 		delete *it;
+    
     return ans;
 }
 
@@ -52,16 +55,16 @@ int similarity(const string& riddle, const string& guess) {
 
 */
 int main() {
-	ifstream fin("input.txt");
-	string riddle;
-	getline(fin, riddle);
+    ifstream fin("input.txt");
+    string riddle;
+    getline(fin, riddle);
 
-	vector <Theory> theories = solve(riddle);
+    vector <Theory> theories = solve(riddle);
 	
     string ans;
 	for(size_t i = 0; i < theories.size(); ++i)
 		if (similarity(riddle, theories[i](riddle)) >= similarity(riddle, ans))
 		    ans = theories[i](riddle);
 
-	cout << "Best guess was: " << ans << endl;
+	cout << "Best guess was: '" << ans << "'" << endl;
 }
