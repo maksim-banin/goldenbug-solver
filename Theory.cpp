@@ -25,7 +25,7 @@ Theory Theory::addRule(char from, char to) const {
 	return ans;
 }
 
-string Theory::operator()(const string& str) {
+string Theory::apply(const string& str) {
 	string ans;
 	for (size_t i = 0; i < str.size(); ++i)
 		if (str[i] == ' ')
@@ -37,7 +37,7 @@ string Theory::operator()(const string& str) {
 	return ans;
 }
 
-bool Theory::operator[](const string& str) {
+bool Theory::isFinished(const string& str) {
 	for (size_t i = 0; i < str.size(); ++i)
 		if (rules.find(str[i]) == rules.end())
 			return false;

@@ -23,12 +23,12 @@ vector<Theory> solve(const string & riddle) {
 		Theory curr = q.front();
 		q.pop();
 
-		if (curr[riddle]) {
-			cout << curr(riddle) << endl;
+		if (curr.isFinished(riddle)) {
+			cout << curr.apply(riddle) << endl;
 			ans.push_back(curr);
 		}
 
-		cout << i << "(" << q.size() << ")\t " << curr(riddle) << endl;
+		cout << i << "(" << q.size() << ")\t " << curr.apply(riddle) << endl;
 
 		for (vector<Expert*>::iterator it = exps.begin(); it != exps.end(); ++it) {
 			vector<Theory> vt = (*it)->derive(curr, riddle);
@@ -55,14 +55,13 @@ int similarity(const string& riddle, const string& guess) {
 void evaluate(vector<Theory> & theories, string & riddle) {
 	string ans;
 	for (size_t i = 0; i < theories.size(); ++i)
-		if (similarity(riddle, theories[i](riddle)) >= similarity(riddle, ans))
-			ans = theories[i](riddle);
+		if (similarity(riddle, theories[i].apply(riddle)) >= similarity(riddle, ans))
+			ans = theories[i].apply(riddle);
 
 	cout << "Best guess was: '" << ans << "'" << endl;
 }
 
 /*
-
  */
 int main() {
 	ifstream fin("tests.txt");
