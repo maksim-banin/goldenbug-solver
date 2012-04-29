@@ -19,12 +19,13 @@ vector<Theory> solve(const string & riddle) {
 	exps.push_back(new FreqExpert());
 	exps.push_back(new DictExpert());
 
-	queue<Theory> q;
+	set<Theory> q, was;
 	vector<Theory> ans;
-	q.push(Theory());
+	q.insert(Theory());
 	for (size_t i = 0; i < MAX_INVOCATIONS && !q.empty(); ++i) {
-		Theory curr = q.front();
-		q.pop();
+		Theory curr = *(q.begin());
+		was.insert(curr);
+		q.erase(curr);
 
 		if (curr.isFinished(riddle)) {
 			cout << curr.apply(riddle) << endl;
@@ -35,9 +36,10 @@ vector<Theory> solve(const string & riddle) {
 
 		for (vector<Expert*>::iterator it = exps.begin(); it != exps.end(); ++it) {
 			vector<Theory> vt = (*it)->derive(curr, riddle);
-			//cerr << "vt.stize() == " << vt.size() << endl;
+
 			for (size_t i = 0; i < vt.size(); ++i)
-				q.push(vt[i]);
+				if (was.find(vt[i]) == was.end())
+					q.insert(vt[i]);
 		}
 	}
 

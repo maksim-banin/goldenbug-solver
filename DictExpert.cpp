@@ -41,12 +41,15 @@ vector<Theory> DictExpert::derive(const Theory &t, const string& riddle) {
 	vector<Theory> ans;
 	for (size_t i = 0; i < vs.size(); ++i)
 		if (dic.find(normalize(vs[i])) != dic.end()) {
+			vector<Theory> curr_ans;
 			set<string> temp = dic.find(normalize(vs[i]))->second;
 			for (set<string>::iterator it = temp.begin(); it != temp.end(); ++it) {
 				Theory curr(t);
 				if (t.tryDerive(vs[i], *it, curr))
-					ans.push_back(curr);
+					curr_ans.push_back(curr);
 			}
+			if (ans.size() == 0 || (curr_ans.size() > 1 && ans.size() > curr_ans.size()))
+				ans = curr_ans;
 		}
 	return ans;
 }
