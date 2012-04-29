@@ -14,7 +14,6 @@ DESTDIR       = bin
 
 all:
 	$(CXX) -c $(CXXFLAGS) $(SOURCES)
-	mkdir ./bin
 	mv $(OBJECTS) ./bin
 	cp tests.txt ./bin
 	$(LINK) ./bin/$(OBJECTS) -o ./bin/test

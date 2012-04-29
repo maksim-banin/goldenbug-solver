@@ -13,8 +13,8 @@ struct Theory {
 	Theory(const Theory& t);
 	Theory(const map<char, char> & R, const set<char>& UF, const set<char>& UT);
 	Theory addRule(char from, char to) const;
-	string apply(const string& str);
-	bool isFinished(const string& str);
+	string apply(const string& str) ;
+	bool isFinished(const string& str) const;
 	bool operator<(const Theory& other) const;
 };
 

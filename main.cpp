@@ -9,6 +9,9 @@
 #include "DictExpert.h"
 using namespace std;
 
+/*
+ * Perform breath-first search
+ */
 vector<Theory> solve(const string & riddle) {
 	const size_t MAX_INVOCATIONS = 50;
 
@@ -44,6 +47,9 @@ vector<Theory> solve(const string & riddle) {
 	return ans;
 }
 
+/*
+ * Counts amount of same letters on the same positions in both strings
+ */
 int similarity(const string& riddle, const string& guess) {
 	int ans = 0;
 	for (size_t i = 0; i < min(riddle.size(), guess.size()); ++i)
@@ -52,6 +58,9 @@ int similarity(const string& riddle, const string& guess) {
 	return ans;
 }
 
+/*
+ * Amongst all the theories, report one with best guess rate
+ */
 void evaluate(vector<Theory> & theories, string & riddle) {
 	string ans;
 	for (size_t i = 0; i < theories.size(); ++i)
@@ -62,6 +71,7 @@ void evaluate(vector<Theory> & theories, string & riddle) {
 }
 
 /*
+ * Open tests file and run all tests
  */
 int main() {
 	ifstream fin("tests.txt");

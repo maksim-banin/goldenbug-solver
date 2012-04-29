@@ -8,6 +8,9 @@ using std::string;
 
 #ifndef DICTEXPERT_H_
 #define DICTEXPERT_H_
+/*
+ * Derive new guesses based on dictionary
+ */
 class DictExpert: public Expert {
 	map<string, set<string> > dic;
 

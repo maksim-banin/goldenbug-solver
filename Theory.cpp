@@ -37,7 +37,7 @@ string Theory::apply(const string& str) {
 	return ans;
 }
 
-bool Theory::isFinished(const string& str) {
+bool Theory::isFinished(const string& str) const {
 	for (size_t i = 0; i < str.size(); ++i)
 		if (rules.find(str[i]) == rules.end())
 			return false;
