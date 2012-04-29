@@ -25,6 +25,24 @@ Theory Theory::addRule(char from, char to) const {
 	return ans;
 }
 
+bool Theory::tryDerive(const string& p_from, const string& p_to, Theory & curr) const {
+	bool good = true;
+	for (size_t j = 0; j < p_to.size(); ++j) {
+		char from = p_from[j], to = p_to[j];
+		if (used_from.count(from) && rules.find(from)->second != to) {
+			good = false;
+			break;
+		}
+		if (used_to.count(to)) {
+			good = false;
+			break;
+		}
+		curr = curr.addRule(from, to);
+	}
+
+	return good;
+}
+
 string Theory::apply(const string& str) {
 	string ans;
 	for (size_t i = 0; i < str.size(); ++i)
@@ -48,3 +66,10 @@ bool Theory::operator<(const Theory& other) const {
 	return rules < other.rules;
 }
 
+bool Theory::hasTo(char c) const{
+	return used_to.find(c) != used_to.end();
+}
+
+bool Theory::hasFrom(char c) const{
+	return used_from.find(c) != used_from.end();
+}

@@ -40,11 +40,11 @@ vector<Theory> FreqExpert::derive(const Theory& t, const string& riddle) {
 
 	size_t fi = 0, ti = 0;
 	for (; fi < real_order.size(); ++fi)
-		if (t.used_from.find(real_order[fi]) == t.used_from.end())
+		if (!t.hasFrom(real_order[fi]))
 			break;
 
 	for (; ti < perfect_order.size(); ++ti)
-		if (t.used_to.find(perfect_order[ti]) == t.used_to.end())
+		if (!t.hasTo(perfect_order[ti]))
 			break;
 
 	if (fi >= real_order.size() || ti >= perfect_order.size())
@@ -52,4 +52,3 @@ vector<Theory> FreqExpert::derive(const Theory& t, const string& riddle) {
 
 	return vector<Theory> (1, t.addRule(real_order[fi], perfect_order[ti]));
 }
-
