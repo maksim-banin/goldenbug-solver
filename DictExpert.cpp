@@ -38,7 +38,7 @@ vector<Theory> DictExpert::derive(const Theory &t, const string& riddle) {
 		vs.push_back(tmp);
 	}
 
-	vector<Theory> ans;
+	vector<vector<Theory> > currs;
 	for (size_t i = 0; i < vs.size(); ++i)
 		if (dic.find(normalize(vs[i])) != dic.end()) {
 			vector<Theory> curr_ans;
@@ -48,8 +48,19 @@ vector<Theory> DictExpert::derive(const Theory &t, const string& riddle) {
 				if (t.tryDerive(vs[i], *it, curr))
 					curr_ans.push_back(curr);
 			}
-			if (ans.size() == 0 || (curr_ans.size() > 1 && ans.size() > curr_ans.size()))
-				ans = curr_ans;
+			currs.push_back(curr_ans);
 		}
-	return ans;
+
+	int fails_cnt = 0;
+	for (size_t i = 0; i < currs.size(); ++i)
+		for (size_t j = i + 1; j < currs.size(); ++j)
+			if(currs[i].size() > currs[j].size())
+				swap(currs[i], currs[j]);
+
+	vector<Theory> ans;
+	for (size_t i = 0; i < currs.size(); ++i)
+		for(size_t j = 0; j < currs[i].size(); ++j)
+			ans.push_back(currs[i][j]);
+
+	return fails_cnt > 1 ? vector<Theory> () : ans;
 }

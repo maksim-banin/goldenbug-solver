@@ -14,7 +14,7 @@ public:
 	Theory(const Theory& t);
 	Theory(const map<char, char> & R, const set<char>& UF, const set<char>& UT);
 	Theory addRule(char from, char to) const;
-	string apply(const string& str);
+	string apply(const string& str) const;
 	bool tryDerive(const string& p_from, const string& p_to, Theory & curr) const;
 	bool hasFrom(char c) const;
 	bool hasTo(char c) const;

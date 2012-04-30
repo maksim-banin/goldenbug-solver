@@ -43,13 +43,13 @@ bool Theory::tryDerive(const string& p_from, const string& p_to, Theory & curr) 
 	return good;
 }
 
-string Theory::apply(const string& str) {
+string Theory::apply(const string& str) const{
 	string ans;
 	for (size_t i = 0; i < str.size(); ++i)
 		if (str[i] == ' ')
 			ans += ' ';
 		else if (rules.find(str[i]) != rules.end())
-			ans += 'A' - 'a' + rules[str[i]];
+			ans += 'A' - 'a' + rules.find(str[i])->second;
 		else
 			ans += str[i];
 	return ans;
@@ -63,13 +63,15 @@ bool Theory::isFinished(const string& str) const {
 }
 
 bool Theory::operator<(const Theory& other) const {
+//	if (rules.size() != other.rules.size())
+//		return rules.size() > other.rules.size();
 	return rules < other.rules;
 }
 
-bool Theory::hasTo(char c) const{
+bool Theory::hasTo(char c) const {
 	return used_to.find(c) != used_to.end();
 }
 
-bool Theory::hasFrom(char c) const{
+bool Theory::hasFrom(char c) const {
 	return used_from.find(c) != used_from.end();
 }

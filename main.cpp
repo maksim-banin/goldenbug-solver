@@ -3,6 +3,7 @@
 #include <fstream>
 #include <vector>
 #include <sstream>
+#include <algorithm>
 
 #include "Theory.h"
 #include "FreqExpert.h"
@@ -10,42 +11,48 @@
 using namespace std;
 
 /*
- * Perform breath-first search
+ * Perform depth-first
  */
-vector<Theory> solve(const string & riddle) {
-	const size_t MAX_INVOCATIONS = 50;
+const size_t MAX_INVOCATIONS = 100;
+size_t invocations_counter = 0;
 
-	vector<Expert*> exps;
-	exps.push_back(new FreqExpert());
-	exps.push_back(new DictExpert());
+set<Theory> was;
+vector<Expert*> exps;
 
-	set<Theory> q, was;
+vector<Theory> dfs(const Theory & curr, const string& riddle) {
+	++invocations_counter;
+	if (invocations_counter > MAX_INVOCATIONS)
+		return vector<Theory> ();
+
 	vector<Theory> ans;
-	q.insert(Theory());
-	for (size_t i = 0; i < MAX_INVOCATIONS && !q.empty(); ++i) {
-		Theory curr = *(q.begin());
-		was.insert(curr);
-		q.erase(curr);
+	was.insert(curr);
 
-		if (curr.isFinished(riddle)) {
-			cout << curr.apply(riddle) << endl;
-			ans.push_back(curr);
-		}
+	cout << invocations_counter << "\t" << curr.apply(riddle) << endl;
+	//	cout << ".";
+	//	cout.flush();
 
-		cout << i << "(" << q.size() << ")\t " << curr.apply(riddle) << endl;
-
-		for (vector<Expert*>::iterator it = exps.begin(); it != exps.end(); ++it) {
-			vector<Theory> vt = (*it)->derive(curr, riddle);
-
-			for (size_t i = 0; i < vt.size(); ++i)
-				if (was.find(vt[i]) == was.end())
-					q.insert(vt[i]);
-		}
+	if (curr.isFinished(riddle)) {
+		ans.push_back(curr);
+		return ans;
 	}
 
-	for (vector<Expert*>::iterator it = exps.begin(); it != exps.end(); ++it)
-		delete *it;
+	for (vector<Expert*>::iterator it = exps.begin(); it != exps.end(); ++it) {
+		vector<Theory> vt = (*it)->derive(curr, riddle);
 
+		for (size_t i = 0; i < vt.size(); ++i)
+			if (was.find(vt[i]) == was.end()) {
+				was.insert(vt[i]);
+				vector<Theory> goods = dfs(vt[i], riddle);
+				copy(goods.begin(), goods.end(), back_inserter(ans));
+			}
+	}
+	return ans;
+}
+
+vector<Theory> solve(const string & riddle) {
+	vector<Theory> ans = dfs(Theory(), riddle);
+	was.clear();
+	invocations_counter = 0;
 	return ans;
 }
 
@@ -54,6 +61,7 @@ vector<Theory> solve(const string & riddle) {
  */
 int similarity(const string& riddle, const string& guess) {
 	int ans = 0;
+	//	cout << "Guess is: '"<< guess << "'\n";
 	for (size_t i = 0; i < min(riddle.size(), guess.size()); ++i)
 		if (riddle[i] == tolower(guess[i]))
 			++ans;
@@ -63,13 +71,14 @@ int similarity(const string& riddle, const string& guess) {
 /*
  * Amongst all the theories, report one with best guess rate
  */
-void evaluate(vector<Theory> & theories, string & riddle) {
+double evaluate(vector<Theory> & theories, const string & riddle) {
 	string ans;
 	for (size_t i = 0; i < theories.size(); ++i)
 		if (similarity(riddle, theories[i].apply(riddle)) >= similarity(riddle, ans))
 			ans = theories[i].apply(riddle);
 
 	cout << "Best guess was: '" << ans << "'" << endl;
+	return (double) similarity(riddle, ans) / riddle.size();
 }
 
 /*
@@ -77,11 +86,14 @@ void evaluate(vector<Theory> & theories, string & riddle) {
  */
 int main() {
 	ifstream fin("tests.txt");
+	exps.push_back(new DictExpert());
+	exps.push_back(new FreqExpert());
+
 	while (fin.good()) {
 		string riddle;
 		getline(fin, riddle);
-
+		cout << "Riddle is: '" << riddle << "'\n";
 		vector<Theory> theories = solve(riddle);
-		evaluate(theories, riddle);
+		cout << "Guess quality is: " << evaluate(theories, riddle) << "\n";
 	}
 }
