@@ -13,7 +13,7 @@ using namespace std;
 /*
  * Perform depth-first
  */
-const size_t MAX_INVOCATIONS = 1024;
+const size_t MAX_INVOCATIONS = 128;
 size_t invocations_counter = 0;
 
 set<Theory> was;
@@ -30,13 +30,13 @@ vector<Theory> dfs(const Theory & curr, const string& riddle) {
 
 	if (curr.isFinished(riddle)) {
 		valids.push_back(curr);
-		cout <<  curr.apply(riddle) << endl;
+		//		cout <<  curr.apply(riddle) << endl;
 	}
+	cout << ".";
 
 	for (vector<Expert*>::iterator it = exps.begin(); it != exps.end(); ++it) {
 		vector<Theory> vt = (*it)->derive(curr, riddle);
 
-		//		cout << "vt.size() == " << vt.size() << endl;
 		for (size_t i = 0; i < vt.size(); ++i)
 			if (was.find(vt[i]) == was.end()) {
 				was.insert(vt[i]);
@@ -89,9 +89,10 @@ int main() {
 	while (fin.good()) {
 		string riddle;
 		getline(fin, riddle);
-		cout << "Riddle is: '" << riddle << "'\n";
+		cout << "Cyphertext is: '" << riddle << "'\n";
+		cout << "Solving";
 		solve(riddle);
-		cout << "valids.size() == " << valids.size() << endl;
+		cout << endl;
 		cout << "Guess quality is: " << evaluate(valids, riddle) << "\n";
 		valids.clear();
 	}
