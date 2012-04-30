@@ -13,11 +13,12 @@ using namespace std;
 /*
  * Perform depth-first
  */
-const size_t MAX_INVOCATIONS = 100;
+const size_t MAX_INVOCATIONS = 1024;
 size_t invocations_counter = 0;
 
 set<Theory> was;
 vector<Expert*> exps;
+vector<Theory> valids;
 
 vector<Theory> dfs(const Theory & curr, const string& riddle) {
 	++invocations_counter;
@@ -27,23 +28,19 @@ vector<Theory> dfs(const Theory & curr, const string& riddle) {
 	vector<Theory> ans;
 	was.insert(curr);
 
-	cout << invocations_counter << "\t" << curr.apply(riddle) << endl;
-	//	cout << ".";
-	//	cout.flush();
-
 	if (curr.isFinished(riddle)) {
-		ans.push_back(curr);
-		return ans;
+		valids.push_back(curr);
+		cout <<  curr.apply(riddle) << endl;
 	}
 
 	for (vector<Expert*>::iterator it = exps.begin(); it != exps.end(); ++it) {
 		vector<Theory> vt = (*it)->derive(curr, riddle);
 
+		//		cout << "vt.size() == " << vt.size() << endl;
 		for (size_t i = 0; i < vt.size(); ++i)
 			if (was.find(vt[i]) == was.end()) {
 				was.insert(vt[i]);
-				vector<Theory> goods = dfs(vt[i], riddle);
-				copy(goods.begin(), goods.end(), back_inserter(ans));
+				dfs(vt[i], riddle);
 			}
 	}
 	return ans;
@@ -93,7 +90,9 @@ int main() {
 		string riddle;
 		getline(fin, riddle);
 		cout << "Riddle is: '" << riddle << "'\n";
-		vector<Theory> theories = solve(riddle);
-		cout << "Guess quality is: " << evaluate(theories, riddle) << "\n";
+		solve(riddle);
+		cout << "valids.size() == " << valids.size() << endl;
+		cout << "Guess quality is: " << evaluate(valids, riddle) << "\n";
+		valids.clear();
 	}
 }

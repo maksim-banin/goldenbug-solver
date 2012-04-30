@@ -47,8 +47,9 @@ vector<Theory> FreqExpert::derive(const Theory& t, const string& riddle) {
 		if (!t.hasTo(perfect_order[ti]))
 			break;
 
-	if (fi >= real_order.size() || ti >= perfect_order.size())
-		return vector<Theory> ();
+	vector<Theory> ans;
+	if (fi < real_order.size() && ti < perfect_order.size())
+		ans.push_back(t.addRule(real_order[fi], perfect_order[ti]));
 
-	return vector<Theory> (1, t.addRule(real_order[fi], perfect_order[ti]));
+	return ans;
 }

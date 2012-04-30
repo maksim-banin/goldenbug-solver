@@ -57,14 +57,12 @@ string Theory::apply(const string& str) const{
 
 bool Theory::isFinished(const string& str) const {
 	for (size_t i = 0; i < str.size(); ++i)
-		if (rules.find(str[i]) == rules.end())
+		if (str[i] != ' ' && rules.find(str[i]) == rules.end())
 			return false;
 	return true;
 }
 
 bool Theory::operator<(const Theory& other) const {
-//	if (rules.size() != other.rules.size())
-//		return rules.size() > other.rules.size();
 	return rules < other.rules;
 }
 

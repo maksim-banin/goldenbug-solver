@@ -62,5 +62,5 @@ vector<Theory> DictExpert::derive(const Theory &t, const string& riddle) {
 		for(size_t j = 0; j < currs[i].size(); ++j)
 			ans.push_back(currs[i][j]);
 
-	return fails_cnt > 1 ? vector<Theory> () : ans;
+	return fails_cnt > 0 ? vector<Theory> () : ans;
 }
