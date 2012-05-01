@@ -6,7 +6,7 @@ LINK          = g++
 
 ####### Files
 
-SOURCES       = *.cpp 
+SOURCES       = main.cpp DicExpert.cpp FreqExpert.cpp Theory.cpp 
 OBJECTS       = *.o
 DESTDIR       = bin
 

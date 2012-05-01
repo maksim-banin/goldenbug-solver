@@ -1,99 +1,118 @@
-#include <iostream>
-#include <queue>
-#include <fstream>
+#include <string>
+#include <map>
 #include <vector>
+#include <iostream>
+#include <fstream>
 #include <sstream>
+#include <cassert>
+#include <iterator>
 #include <algorithm>
-
-#include "Theory.h"
-#include "FreqExpert.h"
-#include "DictExpert.h"
+#include <set>
 using namespace std;
 
-/*
- * Perform depth-first
- */
-const size_t MAX_INVOCATIONS = 128;
-size_t invocations_counter = 0;
+map<string, vector<string> > dic; 
+string normalize(const string& s) {
+	string ans(s);
+	for (size_t i = 0; i < s.size(); ++i)
+		ans[i] = 'a' + (find(s.begin(), s.end(), ans[i]) - s.begin());
+	return ans;
+}
 
-set<Theory> was;
-vector<Expert*> exps;
-vector<Theory> valids;
-
-vector<Theory> dfs(const Theory & curr, const string& riddle) {
-	++invocations_counter;
-	if (invocations_counter > MAX_INVOCATIONS)
-		return vector<Theory> ();
-
-	vector<Theory> ans;
-	was.insert(curr);
-
-	if (curr.isFinished(riddle)) {
-		valids.push_back(curr);
-		//		cout <<  curr.apply(riddle) << endl;
+void read_dic(){
+	ifstream fin("dict.txt");
+	while (fin.good()) {
+		string tmp;
+		fin >> tmp;
+		dic[normalize(tmp)].push_back(tmp);
 	}
-	cout << ".";
+}
 
-	for (vector<Expert*>::iterator it = exps.begin(); it != exps.end(); ++it) {
-		vector<Theory> vt = (*it)->derive(curr, riddle);
+vector<string> split(const string& s) {
+	istringstream iss(s);
+	istream_iterator<string> beg(iss);
+	return vector<string> (beg, istream_iterator<string> ());
+}
 
-		for (size_t i = 0; i < vt.size(); ++i)
-			if (was.find(vt[i]) == was.end()) {
-				was.insert(vt[i]);
-				dfs(vt[i], riddle);
+class Theory{
+	string from, to;
+public:
+	Theory(){}
+	Theory(const Theory& t): from(t.from), to(t.to){}
+	Theory(const string& f, const string& t):from(f), to(t){}
+
+	bool compatible(const Theory& b){
+		assert(from.size() == to.size());
+		size_t n = from.size();
+		for(size_t i = 0; i < n; ++i)
+			for(size_t j = 0; j < i; ++j)
+				if((from[i] == from[j]) ^ (to[j] == to[i]))
+					return false;
+		return true;
+	}
+
+	Theory join(const Theory& b){
+		return Theory(from + b.from, to + b.to);		
+	}
+
+	string apply(const vector<string>& vs){
+		string ans;
+		for(size_t i = 0; i < vs.size(); ++i){
+			for(size_t j = 0; j < vs[i].size(); ++j){
+				char dans = '?';			
+				for(size_t k = 0; k < from.size(); ++k)
+					if(from[k] == vs[i][j]){
+						dans = to[k];
+						break;
+					}
+				ans += dans;
 			}
+			ans += ' ';
+		}
+		return ans;
 	}
+};
+
+bool cmp(const vector<Theory> & a, const vector<Theory> & b){
+	return a.size() > b.size();
+}
+
+void compactify(vector<vector<Theory> > & vvt){
+	sort(vvt.begin(), vvt.end(), cmp);
+	vector<Theory> one = vvt.back();
+	vvt.pop_back();
+	vector<Theory> another = vvt.back();
+	vvt.pop_back();
+	cout << one.size() << "\t" << another.size() << endl;
+	
+	vector<Theory> joint;
+	for(size_t i = 0; i < one.size(); ++i)
+		for(size_t j = 0; j < another.size(); ++j)
+			if(one[i].compatible(another[j])){
+				Theory tmp(one[i]);
+				joint.push_back(tmp.join(another[j]));
+			}
+	vvt.push_back(joint);
+}
+
+set<Theory> olw(vector<string> vs){
+	set<Theory> ans;
+	for(size_t i = 0; i < vs.size(); ++i)
+		if(vs[i].size() == 1){
+			ans.insert(Theory(vs[i], "i"));
+			ans.insert(Theory(vs[i], "a"));
+		}
 	return ans;
 }
 
-vector<Theory> solve(const string & riddle) {
-	vector<Theory> ans = dfs(Theory(), riddle);
-	was.clear();
-	invocations_counter = 0;
-	return ans;
-}
-
-/*
- * Counts amount of same letters on the same positions in both strings
- */
-int similarity(const string& riddle, const string& guess) {
-	int ans = 0;
-	//	cout << "Guess is: '"<< guess << "'\n";
-	for (size_t i = 0; i < min(riddle.size(), guess.size()); ++i)
-		if (riddle[i] == tolower(guess[i]))
-			++ans;
-	return ans;
-}
-
-/*
- * Amongst all the theories, report one with best guess rate
- */
-double evaluate(vector<Theory> & theories, const string & riddle) {
-	string ans;
-	for (size_t i = 0; i < theories.size(); ++i)
-		if (similarity(riddle, theories[i].apply(riddle)) >= similarity(riddle, ans))
-			ans = theories[i].apply(riddle);
-
-	cout << "Best guess was: '" << ans << "'" << endl;
-	return (double) similarity(riddle, ans) / riddle.size();
-}
-
-/*
- * Open tests file and run all tests
- */
-int main() {
+int main(){
+	read_dic();
 	ifstream fin("tests.txt");
-	exps.push_back(new DictExpert());
-	exps.push_back(new FreqExpert());
-
 	while (fin.good()) {
 		string riddle;
 		getline(fin, riddle);
-		cout << "Cyphertext is: '" << riddle << "'\n";
-		cout << "Solving";
-		solve(riddle);
-		cout << endl;
-		cout << "Guess quality is: " << evaluate(valids, riddle) << "\n";
-		valids.clear();
+		vector<string> vs = split(riddle);
+		set<Theory> one_letter = olw(vs);
+		
+		cout << "one_letter.size() == " << one_letter.size() << endl;		
 	}
 }
