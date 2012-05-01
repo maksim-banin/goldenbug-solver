@@ -10,7 +10,7 @@
 #include <set>
 using namespace std;
 
-map<string, vector<string> > dic; 
+map<string, vector<string> > dic;
 string normalize(const string& s) {
 	string ans(s);
 	for (size_t i = 0; i < s.size(); ++i)
@@ -18,7 +18,7 @@ string normalize(const string& s) {
 	return ans;
 }
 
-void read_dic(){
+void read_dic() {
 	ifstream fin("dict.txt");
 	while (fin.good()) {
 		string tmp;
@@ -33,34 +33,39 @@ vector<string> split(const string& s) {
 	return vector<string> (beg, istream_iterator<string> ());
 }
 
-class Theory{
+class Theory {
 	string from, to;
 public:
-	Theory(){}
-	Theory(const Theory& t): from(t.from), to(t.to){}
-	Theory(const string& f, const string& t):from(f), to(t){}
+	Theory() {
+	}
+	Theory(const Theory& t) :
+		from(t.from), to(t.to) {
+	}
+	Theory(const string& f, const string& t) :
+		from(f), to(t) {
+	}
 
-	bool compatible(const Theory& b) const{
+	bool compatible(const Theory& b) const {
 		assert(from.size() == to.size());
 		size_t n = from.size();
-		for(size_t i = 0; i < n; ++i)
-			for(size_t j = 0; j < i; ++j)
-				if((from[i] == b.from[j]) ^ (to[j] == b.to[i]))
+		for (size_t i = 0; i < n; ++i)
+			for (size_t j = 0; j < i; ++j)
+				if ((from[i] == b.from[j]) ^ (to[j] == b.to[i]))
 					return false;
 		return true;
 	}
 
-	Theory join(const Theory& b)const{
-		return Theory(from + b.from, to + b.to);		
+	Theory join(const Theory& b) const {
+		return Theory(from + b.from, to + b.to);
 	}
 
-	string apply(const vector<string>& vs)const{
+	string apply(const vector<string>& vs) const {
 		string ans;
-		for(size_t i = 0; i < vs.size(); ++i){
-			for(size_t j = 0; j < vs[i].size(); ++j){
-				char dans = '?';			
-				for(size_t k = 0; k < from.size(); ++k)
-					if(from[k] == vs[i][j]){
+		for (size_t i = 0; i < vs.size(); ++i) {
+			for (size_t j = 0; j < vs[i].size(); ++j) {
+				char dans = '?';
+				for (size_t k = 0; k < from.size(); ++k)
+					if (from[k] == vs[i][j]) {
 						dans = to[k];
 						break;
 					}
@@ -70,56 +75,39 @@ public:
 		}
 		return ans;
 	}
-	bool operator<(const Theory& other) const{
-		if(from.length() != other.from.length())
+	bool operator<(const Theory& other) const {
+		if (from.length() != other.from.length())
 			return from.length() < other.from.length();
-		if(from != other.from)
+		if (from != other.from)
 			return from < other.from;
 		return to < other.to;
 	}
+	string str() const {
+		return "'" + from + "' -> '" + to + "'";
+	}
 };
 
-bool cmp(const vector<Theory> & a, const vector<Theory> & b){
-	return a.size() > b.size();
-}
-
-void compactify(vector<vector<Theory> > & vvt){
-	sort(vvt.begin(), vvt.end(), cmp);
-	vector<Theory> one = vvt.back();
-	vvt.pop_back();
-	vector<Theory> another = vvt.back();
-	vvt.pop_back();
-	cout << one.size() << "\t" << another.size() << endl;
-	
-	vector<Theory> joint;
-	for(size_t i = 0; i < one.size(); ++i)
-		for(size_t j = 0; j < another.size(); ++j)
-			if(one[i].compatible(another[j])){
-				Theory tmp(one[i]);
-				joint.push_back(tmp.join(another[j]));
-			}
-	vvt.push_back(joint);
-}
-
-set<Theory> olw(vector<string> vs){
-	set<Theory> ans;
-	for(size_t i = 0; i < vs.size(); ++i)
-		if(vs[i].size() == 1){
-			ans.insert(Theory(vs[i], "i"));
-			ans.insert(Theory(vs[i], "a"));
-		}
-	return ans;
-}
-
-int main(){
+int main() {
 	read_dic();
 	ifstream fin("tests.txt");
 	while (fin.good()) {
 		string riddle;
 		getline(fin, riddle);
 		vector<string> vs = split(riddle);
-		set<Theory> one_letter = olw(vs);
-		
-		cout << "one_letter.size() == " << one_letter.size() << endl;		
+		size_t N = vs.size();
+		vector<set<pair<char, char> > >  vspcc(N);
+		for(size_t i = 0; i < N; ++i){
+			vector<string> match = dic[normalize(vs[i])];
+			cout << vs[i] << "\t" << match.size() << "\tguesses\t";
+			for(size_t j = 0; j < match.size(); ++j)
+				for(size_t k = 0; k < vs[i].size(); ++k)
+					vspcc[i].insert(make_pair(vs[i][k], match[j][k]));
+			cout << vspcc[i].size() << "\tsubs\n";
+		}
+		vector<set<pair<char, char> > > allowed(N);		
+		for(size_t i = 0; i < N; ++i){
+			allowed[i] = vspcc[i];
+			
+		}
 	}
 }
