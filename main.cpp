@@ -45,7 +45,7 @@ public:
 		size_t n = from.size();
 		for(size_t i = 0; i < n; ++i)
 			for(size_t j = 0; j < i; ++j)
-				if((from[i] == from[j]) ^ (to[j] == to[i]))
+				if((from[i] == b.from[j]) ^ (to[j] == b.to[i]))
 					return false;
 		return true;
 	}
@@ -69,6 +69,13 @@ public:
 			ans += ' ';
 		}
 		return ans;
+	}
+	bool operator<(const Theory& other) const{
+		if(from.length() != other.from.length())
+			return from.length() < other.from.length();
+		if(from != other.from)
+			return from < other.from;
+		return to < other.to;
 	}
 };
 
