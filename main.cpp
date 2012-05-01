@@ -40,7 +40,7 @@ public:
 	Theory(const Theory& t): from(t.from), to(t.to){}
 	Theory(const string& f, const string& t):from(f), to(t){}
 
-	bool compatible(const Theory& b){
+	bool compatible(const Theory& b) const{
 		assert(from.size() == to.size());
 		size_t n = from.size();
 		for(size_t i = 0; i < n; ++i)
@@ -50,11 +50,11 @@ public:
 		return true;
 	}
 
-	Theory join(const Theory& b){
+	Theory join(const Theory& b)const{
 		return Theory(from + b.from, to + b.to);		
 	}
 
-	string apply(const vector<string>& vs){
+	string apply(const vector<string>& vs)const{
 		string ans;
 		for(size_t i = 0; i < vs.size(); ++i){
 			for(size_t j = 0; j < vs[i].size(); ++j){
