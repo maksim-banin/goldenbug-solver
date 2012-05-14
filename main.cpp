@@ -93,21 +93,17 @@ int main() {
 	while (fin.good()) {
 		string riddle;
 		getline(fin, riddle);
-		vector<string> vs = split(riddle);
-		size_t N = vs.size();
-		vector<set<pair<char, char> > >  vspcc(N);
-		for(size_t i = 0; i < N; ++i){
-			vector<string> match = dic[normalize(vs[i])];
-			cout << vs[i] << "\t" << match.size() << "\tguesses\t";
-			for(size_t j = 0; j < match.size(); ++j)
-				for(size_t k = 0; k < vs[i].size(); ++k)
-					vspcc[i].insert(make_pair(vs[i][k], match[j][k]));
-			cout << vspcc[i].size() << "\tsubs\n";
+		vector<string> words = split(riddle);
+		vector<vector< Theory> > vvt(words.size());
+		for(size_t i = 0; i < words.size(); ++i){
+			vector<string> decod = dic[normalize(words[i])];
+			for(size_t j = 0; j < decod.size(); ++j)
+				vvt[i].push_back(Theory(words[i], decod[j]));
 		}
-		vector<set<pair<char, char> > > allowed(N);		
-		for(size_t i = 0; i < N; ++i){
-			allowed[i] = vspcc[i];
-			
+		for(size_t i = 0; i < words.size(); ++i){
+			// Look at the smallest set, take such item from it that smallest remaining is biggest			
+			cout << words[i] << '\t' << vvt[i].size() << '\t' << vvt[i][0].str() << '\n';
 		}
+		cout << '\n';
 	}
 }
