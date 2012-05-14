@@ -87,6 +87,38 @@ public:
 	}
 };
 
+vector<Theory> filter(const Theory& t, const vector<Theory>& vt){
+	vector<Theory> ans;
+	for(size_t i = 0; i < vt.size(); ++i)
+		if(t.compatible(vt[i]))
+			ans.push_back(vt[i]);
+	return ans;
+}
+
+size_t min_filtered(const Theory& t, const vector<vector<Theory> > & vvt){
+	size_t ans = 1e9;
+	for(size_t i = 0; i < vvt.size(); ++i)
+		ans = min(filter(t, vvt[i]).size(), ans);
+	return ans;
+}
+
+Theory minimax_filtered(const vector<Theory> proposals, const vector<vector<Theory> > & others){
+	Theory ans;
+	size_t cnt = 0;
+	for(size_t i = 0 ; i < proposals.size(); ++i)
+		if(min_filtered(proposals[i], others) > cnt){
+			ans = proposals[i];
+			cnt = min_filtered(proposals[i], others);
+		}
+	return ans;
+}
+
+bool cmp(const vector<Theory> & vthis, const vector<Theory> & vother){
+	if(vthis.size() != vother.size())	
+		return vthis.size() > vother.size();
+	return vthis < vother;
+}
+
 int main() {
 	read_dic();
 	ifstream fin("tests.txt");
@@ -101,8 +133,11 @@ int main() {
 				vvt[i].push_back(Theory(words[i], decod[j]));
 		}
 		for(size_t i = 0; i < words.size(); ++i){
-			// Look at the smallest set, take such item from it that smallest remaining is biggest			
-			cout << words[i] << '\t' << vvt[i].size() << '\t' << vvt[i][0].str() << '\n';
+			// Look at the smallest set, take such item from it that smallest remaining is biggest
+			sort(vvt.begin(), vvt.end(), cmp);
+			vector<Theory> prop = vvt.back();
+			vvt.pop_back();									
+			cout << words[i] << "\tvvt[i].size() = " << vvt[i].size() << "\tminimax_filtered = " << minimax_filtered(prop, vvt).str() << '\n';
 		}
 		cout << '\n';
 	}
